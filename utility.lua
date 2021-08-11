@@ -47,10 +47,6 @@ function Unserialize(lua)
     return func()
 end
 
-Database = {}
-Funcs = {}
-Ctrl = {}
-
 function RegistDatabaePage(name, mod)
     Database[name] = mod
 end

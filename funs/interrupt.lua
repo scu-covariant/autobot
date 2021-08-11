@@ -3,7 +3,7 @@ local info = {
     SelfName = "interrupt",
     Database = "irptdb",
     CtrlName = "irptctrl",
-    Terminal = true,
+    Terminal = false,
 }
 
 --@enum optional

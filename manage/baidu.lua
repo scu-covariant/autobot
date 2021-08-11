@@ -3,14 +3,12 @@ local control = {
     Running = true,
 }
 
-
-
 local module = {
     Manage = control,
 
-    Condition = {}, -- function array
+    Condition = {},
 
-    React = {},  -- function array
+    React = {}
 }
 
 return module

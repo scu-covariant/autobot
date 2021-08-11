@@ -3,7 +3,7 @@ local info = {
     SelfName = "autorepeat",
     Database = "repeatdb",
     CtrlName = "repeatctrl",
-    Terminal = true,
+    Terminal = false,
 }
 
 --@enum optional
