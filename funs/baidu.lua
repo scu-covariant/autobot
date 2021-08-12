@@ -13,7 +13,7 @@ local errnum = {
 }
 
 --@impl interface
-local function filiter(msgstr)
+local function filiter(msgstr, db)
     return 1 == string.find(msgstr, "百度一下") 
 end
 

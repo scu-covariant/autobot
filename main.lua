@@ -1,6 +1,15 @@
 require("data.mod")
 local ring = require("data.data.ring")
 
+local function JudgeRing(uid)
+	for k, v in pairs(ring._All) do 
+		if string.find(uid, k) ~= nil then 
+			return true
+		end
+	end
+	return false
+end
+
 Event.subscribe("GroupMessageEvent", function(event) 
 	local msgstr = tostring(event.message)
 	local uid = tostring(event.sender)
@@ -10,7 +19,7 @@ Event.subscribe("GroupMessageEvent", function(event)
 		
 		if ctrl.Running then 
 			print("判断事件："..actor.Info.SelfName)
-			if  actor.Filiter(msgstr) then 
+			if  actor.Filiter(msgstr, dbpage) then 
 				print(actor.Info.SelfName.." 条件满足")
 				actor.Act(event, actor.Checker(0, dbpage, uid), 0, dbpage)
 				actor.After(dbpage, uid)
@@ -28,7 +37,7 @@ Event.subscribe("GroupMessageEvent", function(event)
 		--判断权限, 执行管理员的命令
 		-- if ring.GetRing(uid) <= 2 then 
 		
-		if uid:find("2821006329") ~= nil then
+		if JudgeRing(uid) then
 			print("权限足够， 管理员命令判断|"..uid.."|")
 			for index, cond in ipairs(Ctrl[actor.Info.CtrlName].Condition) do 
 				if cond(event, dbpage, ctrl) then 

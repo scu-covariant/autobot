@@ -12,7 +12,7 @@ local errnum = {
 }
 
 --@impl interface
-local function filiter(msgstr)
+local function filiter(msgstr, db)
     return true
 end
 

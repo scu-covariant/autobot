@@ -12,7 +12,7 @@ local errnum = {
 }
 
 --@impl interface
-local function filiter(msgstr)
+local function filiter(msgstr, db)
     return msg:find("来点壁纸") ~= nil
 end
 

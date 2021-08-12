@@ -1,6 +1,5 @@
 
-if nil == false then 
-print(1)
-end
+local str = "忘记c~++"
+local i = string.find(str, "~")
+print(i)
 
-print(2)

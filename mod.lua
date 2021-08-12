@@ -6,6 +6,7 @@ local mods = {
     [1] = "repeat",
     -- [2] = "paper",
     [2] = "baidu",
+    [3] = "ka",
 
 }
 
