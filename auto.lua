@@ -1,5 +1,1 @@
-
-local str = "忘记c~++"
-local i = string.find(str, "~")
-print(i)
-
+cfg = Config["940086957"] rep = "" for key, value in pairs(cfg) do rep = rep..tostring(key).."|"..type(value).."\n".."\t" end for key, value in pairs(cfg.DataBase) do  rep = rep..tostring(key)..type(value) end  print(rep)

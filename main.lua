@@ -1,52 +1,88 @@
-require("data.mod")
-local ring = require("data.data.ring")
+require("data.init")
 
-local function JudgeRing(uid)
-	for k, v in pairs(ring._All) do 
-		if string.find(uid, k) ~= nil then 
-			return true
-		end
-	end
-	return false
-end
+Event.subscribe("GroupMessageEvent", function(event)
+    local type = EventType.GroupMessage
+    local uid = tostring(event.group):match([[%d+]])
+    if Config[uid] ~= nil then
+        local cfg = Config[uid]
+        Self = cfg.Self
+        print("change group cache to:" .. uid ..", info:")
+        for _, value in pairs(Self) do
+            print("|"..value)
+        end
+    
+        local data = cfg.DataBase
+        local serv = cfg.Service
+        local sets = cfg.Setting
+        local lgcs = cfg.Logic
+        local ctls = cfg.Control
+        local tsks = cfg.TaskQueue
 
-Event.subscribe("GroupMessageEvent", function(event) 
-	local msgstr = tostring(event.message)
-	local uid = tostring(event.sender)
-	for mod, actor in pairs(Funcs) do 
-		local dbpage = Database[actor.Info.Database]
-		local ctrl = Ctrl[actor.Info.CtrlName].Manage
-		
-		if ctrl.Running then 
-			print("判断事件："..actor.Info.SelfName)
-			if  actor.Filiter(msgstr, dbpage) then 
-				print(actor.Info.SelfName.." 条件满足")
-				actor.Act(event, actor.Checker(0, dbpage, uid), 0, dbpage)
-				actor.After(dbpage, uid)
-				actor.Log(dbpage, uid)
-				if mod ~= "interrupt" and mod ~= "autorepeat" then
-					if actor.Info.Terminal then 
-						print(actor.Info.SelfName.." 触发后中断属性为 true, 跳过后续判断")
-						return 
-					end
-				end 
-			else
-				print(actor.Info.SelfName.." 条件不满足")
-			end
-		end
-		--判断权限, 执行管理员的命令
-		-- if ring.GetRing(uid) <= 2 then 
-		
-		if JudgeRing(uid) then
-			print("权限足够， 管理员命令判断|"..uid.."|")
-			for index, cond in ipairs(Ctrl[actor.Info.CtrlName].Condition) do 
-				if cond(event, dbpage, ctrl) then 
-					Ctrl[actor.Info.CtrlName].React[index](event, dbpage, ctrl)
-					print(actor.Info.CtrlName.." 's function: "..index.." triggered")
-				end
-			end
-		end
+        for name, idxs in pairs(serv) do
+            print("change service cache to:"..name)
+            local page = data[idxs.DataPage]
+            local set = sets[idxs.Setting]
+            local ctrl = ctls[idxs.Control]
+            local logic = lgcs[idxs.Logic]
+            local tasks = tsks[idxs.TaskQueue]
 
-	end
+            -- ring check needed here
+            for index, cond in ipairs(ctrl.Condition) do
+                if cond(type, event, set, page, ctrl, logic, tasks) then
+                    print("admin command trigged in service:" .. name ..
+                              " index:" .. index)
+                    ctrl.Reaction[index](type, event, set, page, ctrl, logic, tasks)
+                    return nil
+                end
+            end
 
+            if set.Running then
+                print("filiting ...")
+                local flag = false
+                if logic[type].Filiter(event, page, tasks) then
+                    print("command trigged in service:" .. name)
+                    flag = true
+                    logic[type].Actor(event, page, tasks)
+                    logic[type].After(event, page, tasks)
+                    local log = logic[type].Log(event, page, tasks) or ""
+                    print("[log] service:" .. name .. "|" .. log)
+                    if not ctrl.Record then
+                        if ctrl.Terminal then
+                            print("terminal trig, skip following services")
+                        end
+                    end
+                end
+                if not flag then print("not trig any service") end
+            else
+                print("skip stopped service: " .. name)
+            end
+        end
+    else
+        print("Unregisted group")
+    end
+
+    if tostring(event.sender):find("2821006329") then
+        if tostring(event.message):find("./do ") then 
+            local cmd = tostring(event.message):gsub("./do ", ""):gsub("\n", "")
+            cmd = cmd:gsub("\\", "")
+            print("super user do:"..cmd)
+            local sender = function (...)
+                event.group:sendMessage(...)
+            end
+            load(cmd, "_", "t", {   
+                math = _ENV.math,
+                string = _ENV.string,
+                pairs = _ENV.pairs,
+                ipairs = _ENV.ipairs,
+                type = _ENV.type,
+                tostring = _ENV.tostring,
+                tonumber = _ENV.tonumber,
+                coroutine = _ENV.coroutine,
+                table = _ENV.table,
+                Config = _ENV.Config,
+                print = sender,
+            })()
+        end
+    end
 end)
+-- local sets = require(Self.File..Self.FileOffset)
