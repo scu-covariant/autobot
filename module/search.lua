@@ -32,7 +32,10 @@ local module = {
             ["百度一下"] = [[http://www.oxox.ltd/bai/du.html?]],
             ["教务处搜索"] = [[%教务处链接%]],
             ["知乎搜索"] = [[%知乎链接%]],
-            ["github search"] = [[%https://github.com/search?q=]],
+            ["github search"] = [[https://github.com/search?q=]],
+            ["hub repo"] = [[https://github.com/search?q=]], -- the same to github search
+            ["hub user"] = [[https://github.com/search?type=users&q=]],
+            ["bing"]=[[https://cn.bing.com/search?q=]]
         },
         Index = "",
     },
